@@ -56,7 +56,7 @@ async function searchForever() {
   streamsResponse.data.data.forEach(async (stream) => {
     let user = await db.get(`twitch_user_${stream.user_login}`)
     let start = new Date(stream.started_at)
-    let lastStart = new Date(user.last_start_at)
+    let lastStart = new Date(user?.last_start_at)
 
     // if this stream is new and not banned:
     if (
