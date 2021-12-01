@@ -6,8 +6,8 @@ const { Client, Intents } = require("discord.js")
 const { SlashCommandBuilder } = require("@discordjs/builders")
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] })
 
-const Database = require("@replit/database")
-const db = new Database()
+const { PrismaClient } = require("@prisma/client")
+const prisma = new PrismaClient()
 
 // https://discordjs.guide/popular-topics/builders.html#slash-command-builders
 const commands = [
@@ -73,22 +73,21 @@ client.on("interactionCreate", async (interaction) => {
   let options = interaction.options
   if (interaction.commandName === "blacklist") {
     let username = options.getString("username")
-    let user = db.get(`twitch_user_${username}`)
+    let blacklisted
+    let message
     if (options.getSubcommand() == "add") {
-      await db.set(`twitch_user_${username}`, {
-        ...user,
-        blacklisted: true,
-      })
-      await interaction.reply(`added ${username} to twitch streamer blacklist`)
+      blacklisted = true
+      message = `added ${username} to twitch streamer blacklist`
     } else if (options.getSubcommand() == "remove") {
-      await db.set(`twitch_user_${username}`, {
-        ...user,
-        blacklisted: false,
-      })
-      await interaction.reply(
-        `removed ${username} from twitch streamer blacklist`
-      )
+      blacklisted = false
+      message = `removed ${username} from twitch streamer blacklist`
     }
+    await prisma.twitchUser.upsert({
+      where: { username },
+      update: { blacklisted },
+      create: { username, blacklisted },
+    })
+    await interaction.reply(message)
   }
 })
 

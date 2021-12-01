@@ -4,9 +4,10 @@ require("./server.js")
 const { client } = require("./commands.js")
 
 const { MessageEmbed } = require("discord.js")
-const Database = require("@replit/database")
-const db = new Database()
 const axios = require("axios")
+
+const { PrismaClient } = require("@prisma/client")
+const prisma = new PrismaClient()
 
 let guild = null
 let channel = null
@@ -53,12 +54,13 @@ async function searchForever() {
     }
   )
   streamsResponse.data.data.forEach(async (stream) => {
-    let user = await db.get(`twitch_user_${stream.user_login}`)
-    let start = new Date(stream.started_at)
-    let lastStart = new Date(user?.last_start_at)
+    let username = stream.user_login
+    let user = await prisma.twitchUser.findUnique({ where: { username } })
+    let streamStart = new Date(stream.started_at)
+    let lastStart = new Date(user?.lastStartAt)
 
     // if this stream is new and not blacklisted:
-    let isNewStream = start.getTime() != lastStart.getTime()
+    let isNewStream = streamStart.getTime() != lastStart.getTime()
     if (user == null || (!user.blacklisted && isNewStream)) {
       // https://discordjs.guide/popular-topics/embeds.html#embed-preview
       let imageURL = stream.thumbnail_url.replace("-{width}x{height}", "")
@@ -73,9 +75,13 @@ async function searchForever() {
       console.log(stream)
     }
 
-    await db.set(`twitch_user_${stream.user_login}`, {
-      ...user,
-      last_start_at: start,
+    await prisma.twitchUser.upsert({
+      where: { username },
+      update: { lastStartAt: streamStart },
+      create: {
+        username,
+        lastStartAt: streamStart,
+      },
     })
   })
 
