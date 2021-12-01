@@ -16,6 +16,8 @@ const BASE_URL = "https://api.twitch.tv/helix"
 let authToken = null
 let twitchGameID = process.env.TWITCH_GAME_ID
 
+const MINUTES_IN_MILLISECONDS = 1000 * 60
+
 async function main() {
   guild = await client.guilds.fetch(process.env.DISCORD_GUILD_ID)
   channel = await guild.channels.fetch(process.env.DISCORD_CHANNEL_ID)
@@ -39,10 +41,14 @@ async function main() {
     twitchGameID = gamesResponse.data[0].id
   }
 
-  searchForever()
+  search()
 }
 
-async function searchForever() {
+function getTwitchURL(username) {
+  return `https://www.twitch.tv/${username}`
+}
+
+async function search() {
   // https://dev.twitch.tv/docs/api/reference#get-streams
   let streamsResponse = await axios.get(
     `${BASE_URL}/streams?game_id=${twitchGameID}`,
@@ -53,7 +59,16 @@ async function searchForever() {
       },
     }
   )
-  streamsResponse.data.data.forEach(async (stream) => {
+  let streams = streamsResponse.data.data
+  let completedCount = 0
+
+  console.log(`${streams.length} streams found`)
+  if (streams.length == 0) {
+    await markEndedStreams(streams)
+    return
+  }
+
+  streams.forEach(async (stream, index) => {
     let username = stream.user_login
     let user = await prisma.twitchUser.findUnique({ where: { username } })
     let streamStart = new Date(stream.started_at)
@@ -66,7 +81,7 @@ async function searchForever() {
       let imageURL = stream.thumbnail_url.replace("-{width}x{height}", "")
       let embed = new MessageEmbed()
         .setTitle(stream.title)
-        .setURL(`https://www.twitch.tv/${stream.user_login}`)
+        .setURL(getTwitchURL(stream.user_login))
         .setAuthor(stream.user_name)
         .setImage(imageURL)
 
@@ -83,10 +98,32 @@ async function searchForever() {
         lastStartAt: streamStart,
       },
     })
+
+    completedCount += 1
+    if (completedCount == streams.length) {
+      await markEndedStreams(streams)
+    }
+  })
+}
+
+async function markEndedStreams(streams) {
+  let messages = await channel.messages.fetch()
+
+  messages.forEach(async (message) => {
+    if (message.author.id == client.user.id) {
+      let reactions = message.reactions.cache
+
+      let url = message.embeds[0].url
+      if (
+        reactions.every((reaction) => reaction.emoji.name != "🛑") &&
+        streams.every((stream) => getTwitchURL(stream.user_login) != url)
+      ) {
+        await message.react("🛑")
+      }
+    }
   })
 
-  const MILLISECONDS_TO_MINUTES = 1000 * 60
-  setTimeout(searchForever, 1 * MILLISECONDS_TO_MINUTES)
+  setTimeout(search, 2 * MINUTES_IN_MILLISECONDS)
 }
 
 main()

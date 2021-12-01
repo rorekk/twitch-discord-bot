@@ -63,7 +63,7 @@ client.on("debug", console.log)
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return
 
-  let userRoles = await interaction.member.roles.cache
+  let userRoles = interaction.member.roles.cache
   let whitelistedRoles = process.env.DISCORD_ROLE_IDS.split(",")
   if (!userRoles.some((role) => whitelistedRoles.includes(role.id))) {
     await interaction.reply("you do not have permission to use this command")
