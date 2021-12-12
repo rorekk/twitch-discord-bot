@@ -72,7 +72,7 @@ client.on("interactionCreate", async (interaction) => {
 
   let options = interaction.options
   if (interaction.commandName === "blacklist") {
-    let username = options.getString("username")
+    let username = options.getString("username").toLowerCase()
     let blacklisted
     let message
     if (options.getSubcommand() == "add") {
