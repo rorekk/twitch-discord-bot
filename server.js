@@ -1,10 +1,10 @@
-const express = require("express")
-const app = express()
+const http = require("node:http")
 
-app.get("/", (req, res) => {
-  res.send("200")
+const server = http.createServer((req, res) => {
+  res.writeHead(200)
+  res.end()
 })
 
-app.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 3000, () => {
   console.log("server started")
 })
