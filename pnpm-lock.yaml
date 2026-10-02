@@ -29,9 +29,6 @@ importers:
       express:
         specifier: ^4.17.1
         version: 4.17.1
-      node:
-        specifier: ^16.13.0
-        version: 16.13.0
     devDependencies:
       prisma:
         specifier: ^3.13.0
@@ -294,17 +291,9 @@ packages:
     resolution: {integrity: sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==}
     engines: {node: '>= 0.6'}
 
-  node-bin-setup@1.0.6:
-    resolution: {integrity: sha512-uPIxXNis1CRbv1DwqAxkgBk5NFV3s7cMN/Gf556jSw6jBvV7ca4F9lRL/8cALcZecRibeqU+5dFYqFFmzv5a0Q==}
-
   node-fetch@2.6.6:
     resolution: {integrity: sha512-Z8/6vRlTUChSdIgMa51jxQ4lrw/Jy5SOW10ObaA47/RElsAN2c5Pn8bTgFGWn/ibwzXTE8qwr1Yzx28vsecXEA==}
     engines: {node: 4.x || >=6.0.0}
-
-  node@16.13.0:
-    resolution: {integrity: sha512-bCUq6u/0rVHBvCpxLFTv5/kPjJGTltcyWQ2EtqlZ6WOqSpkTVBFtNoJ9tSVIGmadb0KoRsWd2CyNs9bU/drxXQ==}
-    engines: {npm: '>=5.0.0'}
-    hasBin: true
 
   on-finished@2.3.0:
     resolution: {integrity: sha512-ikqdkGAAyf/X/gPhXGvfgAytDZtDbr+bkNUJ0N9h5MI/dmdgCs3l6hoHrcUv41sRKew3jIwrp4qQDXiK99Utww==}
@@ -678,15 +667,9 @@ snapshots:
 
   negotiator@0.6.2: {}
 
-  node-bin-setup@1.0.6: {}
-
   node-fetch@2.6.6:
     dependencies:
       whatwg-url: 5.0.0
-
-  node@16.13.0:
-    dependencies:
-      node-bin-setup: 1.0.6
 
   on-finished@2.3.0:
     dependencies:
