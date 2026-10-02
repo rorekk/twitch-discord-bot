@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@discordjs/builders':
+        specifier: 0.8.2
+        version: 0.8.2
       '@discordjs/rest':
         specifier: 0.1.0-canary.0
         version: 0.1.0-canary.0
