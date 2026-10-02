@@ -1,5 +1,3 @@
-require("dotenv").config()
-
 require("./server.js")
 const { client } = require("./commands.js")
 
